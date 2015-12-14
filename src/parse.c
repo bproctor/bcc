@@ -13,6 +13,8 @@ void parse()
 			printf("String: %s\n", token.value.string);
 		} else if (token.type == T_IDENTIFIER) {
 			printf("Identifier: %s\n", token.value.string);
+		} else {
+			printf("Token: %d\n", token.type);
 		}
 	} while (token.type != EOF);
 }

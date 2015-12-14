@@ -8,6 +8,31 @@ enum {
 	T_INTEGER,
 	T_STRING,
 
+	// Operators
+	T_ANDE,		// &=
+	T_ADDE,		// +=
+	T_COME,		// ~=
+	T_DAND,		// &&
+	T_DEC,		// --
+	T_DEQ,		// ==
+	T_DIVE,		// /=
+	T_DOR,		// ||
+	T_GE,		// >=
+	T_INC,		// ++
+	T_LE,		// <=
+	T_MODE,		// %=
+	T_MULE,		// *=
+	T_NE,		// !=
+	T_ORE,		// |=
+	T_PTR,		// ->
+	T_SHL,		// <<
+	T_SHLE,		// <<=
+	T_SHR,		// >>
+	T_SHRE,		// >>=
+	T_SUBE,		// -=
+	T_XORE,		// ^=
+
+	// Reserved words
 	T_AUTO,
 	T_BREAK,
 	T_CASE,

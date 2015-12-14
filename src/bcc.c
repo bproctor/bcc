@@ -8,7 +8,7 @@ void error(const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	fprintf(stderr, "Line %d: ", lineNumber);
+	fprintf(stderr, "error:%d: ", lineNumber);
 	vfprintf(stderr, fmt, args);
 	fprintf(stderr, "\n");
 	va_end(args);

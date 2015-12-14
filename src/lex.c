@@ -5,8 +5,8 @@
 #include <string.h>
 #include "bcc.h"
 
-// Keeps track of what line number we're on, start on line 1.
-int lineNumber = 1;
+// Keeps track of what line number we're on
+int lineNumber = 0;
 
 // This holds a single character buffer so that we can simulate
 // pushing a character back into the input.  The lexer doesn't 
@@ -128,6 +128,34 @@ char *read_identifier(int first)
 	return str;
 }
 
+// Skip comments
+void skip_comments(int first)
+{
+	int c;
+	int startingLineNumber = lineNumber;
+	// Handle single line comments
+	if (first == '/') {
+		do {
+			c = get();
+		} while (c != '\n' && c != EOF);
+		if (c == EOF) {
+			unget(c);
+		}
+	} else {
+		// Handle multi-line comments
+		while (1) {
+			if ((c = get()) == '*') {
+				if ((c = get())== '/') {
+					break;
+				}
+			}
+			if (c == EOF) {
+				error("Unterminated comment starting on line %d", startingLineNumber);
+			}
+		}
+	}
+}
+
 // This is the main lexer function.  It reads the input and
 // returns a token
 Token lex()
@@ -185,6 +213,127 @@ top:
 		case '\"':
 			token.type = T_STRING;
 			token.value.string = read_string();
+			break;
+		case '!':
+			if ((c = get()) == '=') {
+				token.type = T_NE;
+			} else {
+				unget(c);
+				token.type = '!';
+			}
+			break;
+		case '%':
+			if ((c = get()) == '=') {
+				token.type = T_MODE;
+			} else {
+				unget(c);
+				token.type = '%';
+			}
+			break;
+		case '^':
+			if ((c = get()) == '=') {
+				token.type = T_XORE;
+			} else {
+				unget(c);
+				token.type = '^';
+			}
+			break;
+		case '&':
+			if ((c = get()) == '&') {
+				token.type = T_DAND;
+			} else if (c == '=') {
+				token.type = T_ANDE;
+			} else {
+				unget(c);
+				token.type = '&';
+			}
+			break;
+		case '*':
+			if ((c = get()) == '=') {
+				token.type = T_MULE;
+			} else {
+				unget(c);
+				token.type = '*';
+			}
+			break;
+		case '-':
+			if ((c = get()) == '-') {
+				token.type = T_DEC;
+			} else if (c == '=') {
+				token.type = T_SUBE;
+			} else {
+				unget(c);
+				token.type = '-';
+			}
+			break;
+		case '+':
+			if ((c = get())== '+') {
+				token.type = T_INC;
+			} else if (c == '=') {
+				token.type = T_ADDE;
+			} else {
+				unget(c);
+				token.type = '+';
+			}
+			break;
+		case '=':
+			if ((c = get()) == '=') {
+				token.type = T_DEQ;
+			} else {
+				unget(c);
+				token.type = '=';
+			}
+			break;
+		case '|':
+			if ((c = get()) == '|') {
+				token.type = T_DOR;
+			} else if (c == '=') {
+				token.type = T_ORE;
+			} else {
+				unget(c);
+				token.type = '|';
+			}
+			break;
+		case '<':
+			if ((c = get()) == '<') {
+				if ((c = get()) == '=') {
+					token.type = T_SHLE;
+				} else {
+					unget(c);
+					token.type = T_SHL;
+				}
+			} else if (c == '=') {
+				token.type = T_LE;
+			} else {
+				unget(c);
+				token.type = '<';
+			}
+			break;
+		case '>':
+			if ((c = get()) == '>') {
+				if ((c = get()) == '=') {
+					token.type = T_SHRE;
+				} else {
+					unget(c);
+					token.type = T_SHR;
+				}
+			} else if (c == '=') {
+				token.type = T_GE;
+			} else {
+				unget(c);
+				token.type = '>';
+			}
+			break;
+		case '/':
+			if ((c = get()) == '/' || c == '*') {
+				skip_comments(c);
+				goto top;
+			} else if (c == '=') {
+				token.type = T_DIVE;
+			} else {
+				unget(c);
+				token.type = '/';
+			}
 			break;
 		default:
 			token.type = c;
