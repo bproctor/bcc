@@ -17,6 +17,8 @@ typedef struct Token {
 	} value;
 } Token;
 
+extern int lineNumber;
+
 extern void error(const char *fmt, ...);
 extern Token lex();
 extern void parse();

@@ -1,9 +1,11 @@
-
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "bcc.h"
+
+// Keeps track of what line number we're on, start on line 1.
+int lineNumber = 1;
 
 // This holds a single character buffer so that we can simulate
 // pushing a character back into the input.  The lexer doesn't 
@@ -22,6 +24,12 @@ int get()
 	} else {
 		c = getc(stdin);
 	}
+	
+	// Update the line number 
+	if (c == '\n') {
+		lineNumber++;
+	}
+
 	return c;
 }
 
@@ -31,6 +39,12 @@ void unget(int c)
 {
 	charBufferContents = c;
 	charBufferAvailable = true;
+
+	// If we pushed back a \n, then we're going back
+	// up a line
+	if (c == '\n') {
+		lineNumber--;
+	}
 }
 
 // Read a number
@@ -82,6 +96,8 @@ Token lex()
 top:
 	c = get();
 	switch(c) {
+		case '\n':
+			lineNumber++;
 		case ' ':
 		case '\t':
 			goto top;
