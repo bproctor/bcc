@@ -74,6 +74,9 @@ typedef struct Token {
 		unsigned long long integer;
 		char *string;
 	} value;
+	struct Token *left;
+	struct Token *right;
+	struct Token *next;
 } Token;
 
 typedef struct Keyword {
@@ -82,11 +85,13 @@ typedef struct Keyword {
 } Keyword;
 
 extern Keyword *keywords[26];
-
 extern int lineNumber;
+extern FILE *infile;
+extern FILE *outfile;
 
 extern void error(const char *fmt, ...);
-extern Token lex();
+extern Token *getToken();
 extern void parse();
+extern void compile(Token *);
 
 #endif

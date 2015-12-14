@@ -23,7 +23,7 @@ int get()
 		charBufferAvailable = false;
 		c = charBufferContents;
 	} else {
-		c = getc(stdin);
+		c = getc(infile);
 	}
 	
 	// Update the line number 
@@ -158,12 +158,13 @@ void skip_comments(int first)
 
 // This is the main lexer function.  It reads the input and
 // returns a token
-Token lex()
+Token *getToken()
 {
 	int c;
 	char *str;
-	Token token;
+	Token *token;
 
+	token = malloc(sizeof(Token));
 top:
 	c = get();
 	switch(c) {
@@ -179,10 +180,10 @@ top:
 			// These letters could indicate the beginning of a reserved word
 			// rather than an identifier, check the keywords first.
 			str = read_identifier(c);
-			token.type = lookup_keyword(str);
-			if (token.type == 0) {
-				token.type = T_IDENTIFIER;
-				token.value.string = str;
+			token->type = lookup_keyword(str);
+			if (token->type == 0) {
+				token->type = T_IDENTIFIER;
+				token->value.string = str;
 			} else {
 				// Don't need to save the actual string anymore
 				// if it's a reserved word so free the memory
@@ -201,127 +202,127 @@ top:
 		case 'Z': case '_':
 			// Anthing that starts with one of these characters is an identified
 			// and not a keyword.
-			token.type = T_IDENTIFIER;
-			token.value.string = read_identifier(c);
+			token->type = T_IDENTIFIER;
+			token->value.string = read_identifier(c);
 			break;
 		case '0': case '1': case '2': case '3':
 		case '4': case '5': case '6': case '7':
 		case '8': case '9':
-			token.type = T_INTEGER;
-			token.value.integer = read_integer(c);
+			token->type = T_INTEGER;
+			token->value.integer = read_integer(c);
 			break;
 		case '\"':
-			token.type = T_STRING;
-			token.value.string = read_string();
+			token->type = T_STRING;
+			token->value.string = read_string();
 			break;
 		case '!':
 			if ((c = get()) == '=') {
-				token.type = T_NE;
+				token->type = T_NE;
 			} else {
 				unget(c);
-				token.type = '!';
+				token->type = '!';
 			}
 			break;
 		case '%':
 			if ((c = get()) == '=') {
-				token.type = T_MODE;
+				token->type = T_MODE;
 			} else {
 				unget(c);
-				token.type = '%';
+				token->type = '%';
 			}
 			break;
 		case '^':
 			if ((c = get()) == '=') {
-				token.type = T_XORE;
+				token->type = T_XORE;
 			} else {
 				unget(c);
-				token.type = '^';
+				token->type = '^';
 			}
 			break;
 		case '&':
 			if ((c = get()) == '&') {
-				token.type = T_DAND;
+				token->type = T_DAND;
 			} else if (c == '=') {
-				token.type = T_ANDE;
+				token->type = T_ANDE;
 			} else {
 				unget(c);
-				token.type = '&';
+				token->type = '&';
 			}
 			break;
 		case '*':
 			if ((c = get()) == '=') {
-				token.type = T_MULE;
+				token->type = T_MULE;
 			} else {
 				unget(c);
-				token.type = '*';
+				token->type = '*';
 			}
 			break;
 		case '-':
 			if ((c = get()) == '-') {
-				token.type = T_DEC;
+				token->type = T_DEC;
 			} else if (c == '=') {
-				token.type = T_SUBE;
+				token->type = T_SUBE;
 			} else {
 				unget(c);
-				token.type = '-';
+				token->type = '-';
 			}
 			break;
 		case '+':
 			if ((c = get())== '+') {
-				token.type = T_INC;
+				token->type = T_INC;
 			} else if (c == '=') {
-				token.type = T_ADDE;
+				token->type = T_ADDE;
 			} else {
 				unget(c);
-				token.type = '+';
+				token->type = '+';
 			}
 			break;
 		case '=':
 			if ((c = get()) == '=') {
-				token.type = T_DEQ;
+				token->type = T_DEQ;
 			} else {
 				unget(c);
-				token.type = '=';
+				token->type = '=';
 			}
 			break;
 		case '|':
 			if ((c = get()) == '|') {
-				token.type = T_DOR;
+				token->type = T_DOR;
 			} else if (c == '=') {
-				token.type = T_ORE;
+				token->type = T_ORE;
 			} else {
 				unget(c);
-				token.type = '|';
+				token->type = '|';
 			}
 			break;
 		case '<':
 			if ((c = get()) == '<') {
 				if ((c = get()) == '=') {
-					token.type = T_SHLE;
+					token->type = T_SHLE;
 				} else {
 					unget(c);
-					token.type = T_SHL;
+					token->type = T_SHL;
 				}
 			} else if (c == '=') {
-				token.type = T_LE;
+				token->type = T_LE;
 			} else {
 				unget(c);
-				token.type = '<';
+				token->type = '<';
 			}
 			break;
 		case '>':
 			if ((c = get()) == '>') {
 				if ((c = get()) == '=') {
-					token.type = T_SHRE;
+					token->type = T_SHRE;
 				} else {
 					unget(c);
-					token.type = T_SHR;
+					token->type = T_SHR;
 				}
 			} else if (c == '=') {
-				token.type = T_GE;
+				token->type = T_GE;
 			} else {
 				unget(c);
-				token.type = '>';
+				token->type = '>';
 			}
 			break;
 		case '/':
@@ -329,14 +330,14 @@ top:
 				skip_comments(c);
 				goto top;
 			} else if (c == '=') {
-				token.type = T_DIVE;
+				token->type = T_DIVE;
 			} else {
 				unget(c);
-				token.type = '/';
+				token->type = '/';
 			}
 			break;
 		default:
-			token.type = c;
+			token->type = c;
 	}
 
 	return token;
