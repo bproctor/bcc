@@ -55,10 +55,37 @@ unsigned long long read_integer(int first)
 	unsigned long long n = 0;
 
 	c = first;
-	while (isdigit(c)) {
-		n = (n * 10) + (c - '0');
+	if (first == '0') {
 		c = get();
-	};
+		if (c == 'x' || c == 'X') {
+			// The number is hexidecimal
+			while (1) {
+				c = get();
+				if (isdigit(c)) {
+					n = (n << 4) + (c - '0');
+				} else if (c >= 'a' && c <= 'f') {
+					n = (n << 4) + (c - 'a');
+				} else if (c >= 'A' && c < 'F') {
+					n = (n << 4) + (c - 'A');
+				} else {
+					break;
+				}
+			}
+		} else if (c >= '0' && c <= '7') {
+			// The number if octal
+			do {
+				n = (n << 3) + (c - '0');
+				c = get();
+			} while (c >= '0' && c <= '7');
+		}
+		// Otherwise, the number is just 0
+	} else {
+		// The number is decimal
+		while (isdigit(c)) {
+			n = (n * 10) + (c - '0');
+			c = get();
+		};
+	}
 	return n;
 }
 
