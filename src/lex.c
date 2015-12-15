@@ -16,7 +16,7 @@ static int charBufferContents;
 
 // Get a single character from the input, if a character is available
 // in the buffer, read that first.
-int get()
+static int get()
 {
 	int c;
 	if (charBufferAvailable == true) {
@@ -36,7 +36,7 @@ int get()
 
 // Push a single character back into the input.  Puts the character
 // into the buffer. get() will pick it up on its next call.
-void unget(int c)
+static void unget(int c)
 {
 	charBufferContents = c;
 	charBufferAvailable = true;
@@ -49,7 +49,7 @@ void unget(int c)
 }
 
 // Read a number
-unsigned long long read_integer(int first)
+static unsigned long long read_integer(int first)
 {
 	int c;
 	unsigned long long n = 0;
@@ -90,7 +90,7 @@ unsigned long long read_integer(int first)
 }
 
 // Reads a string and returns a pointer to it.
-char *read_string()
+static char *read_string()
 {
 	int c, length = 0, chunks = 1;
 	char *str, *p;
@@ -117,7 +117,7 @@ char *read_string()
 
 // Looks up a keyword in the keyword table and return the tokenid.  If one is
 // not found, then return 0.
-int lookup_keyword(const char *str)
+static int lookup_keyword(const char *str)
 {
 	Keyword *k = keywords[*str + 'a'];
 	while (k) {
@@ -131,7 +131,7 @@ int lookup_keyword(const char *str)
 
 // Reads an identified and returns a pointer to it.  This is essentially the
 // same as read_string except we check for a different set of characters.
-char *read_identifier(int first)
+static char *read_identifier(int first)
 {
 	int c, length = 0, chunks = 1;
 	char *str, *p;
@@ -156,7 +156,7 @@ char *read_identifier(int first)
 }
 
 // Skip comments
-void skip_comments(int first)
+static void skip_comments(int first)
 {
 	int c;
 	int startingLineNumber = lineNumber;

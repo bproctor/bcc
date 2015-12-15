@@ -67,6 +67,13 @@ enum {
 	T_WHILE,
 };
 
+// TODO: these need an autoconfig or something to determine if they're correct
+// This is at least true for clang on OSX.
+typedef unsigned char uint8;
+typedef unsigned short uint16;
+typedef unsigned int uint32;
+typedef unsigned long uint64;
+
 // Holds a token
 typedef struct Token {
 	int type;
